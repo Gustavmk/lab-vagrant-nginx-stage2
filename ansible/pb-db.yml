@@ -1,20 +1,41 @@
-- name: Setup and Update Config - WEB 
-  hosts: web
+- name: Setup and Update Config - Database 
+  hosts: db
   become: True
   collections:
     - Community.Docker
   vars:
     container_count: 1
-    default_container_name: nginxhost
-    default_container_image: stenote/nginx-hostname
+    default_container_name: database
+    default_container_image: postgres
 
   tasks:
+
+    - name: create DB group
+      become: true
+      group:
+        name: database
+        state: present
+
+    - name: add user to group 
+      become: true
+      user:
+        name: "{{ ansible_user }}"
+        groups: database
+        append: true
+
+    - name: Create directories for Database
+      file: 
+        path: /data/db/{{ default_container_name }}
+        owner: "{{ ansible_user }}"
+        group: database
+        state: directory
+        mode: '0660'
 
     - name: Get running containers
       docker_host_info:
         containers: yes
       register: docker_info
-
+    
     #- name: Stop running containers
     #  docker_container:
     #    name: "{{ item }}"
@@ -38,6 +59,10 @@
         state: started
         recreate: true
         force_kill: true
+        env:
+          POSTGRES_PASSWORD: 'Postgres2018!'
+        volumes:
+          - /data/postgresql/{{ default_container_name }}:/var/lib/postgresql/data 
         ports:
-          - "8080:80"
+          - "5432:5432"
       with_sequence: count={{ container_count }}

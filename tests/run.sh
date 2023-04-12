@@ -1,7 +1,11 @@
 # LB
 ansible-playbook -i ansible/inv.yml ansible/pb-loadbalancer.yml
 
-# WEB 
-ansible-playbook -i ansible/inv.yml ansible/pb-web.yml 
+# BASE 
+ansible-playbook -i ansible/inv.yml ansible/pb-docker.yml 
 
-ansible-playbook -i ansible/inv.yml ansible/pb-web-publish.yml 
+# WEB 
+ansible-playbook -i ansible/inv.yml ansible/pb-web.yml
+
+# DB
+ansible-playbook -i ansible/inv.yml ansible/pb-db.yml 
