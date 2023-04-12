@@ -1,0 +1,99 @@
+- name: Setup and Update Config on NGINX
+  hosts: loadbalancer
+  become: True
+  collections:
+    - nginxinc.nginx_core
+  vars:
+    nginx_path: /etc/nginx
+    nginx_sites: "{{ nginx_path }}/sites-available"
+    site_name: "test.com"
+    upstream_name: "servers"
+
+  tasks:
+    - name: Allow everything and enable UFW
+      community.general.ufw:
+        state: disabled
+        policy: allow
+        
+    - name: Install NGINX
+      ansible.builtin.include_role:
+        name: nginx
+
+    - name: Create directories for ssl certificates
+      file: 
+        path: /etc/ssl/certs/custom
+        owner: root
+        group: root
+        state: directory
+        mode: '0600'
+
+    - name: Create directories for conf.d
+      file: 
+        path: /etc/nginx/conf.d/
+        owner: root
+        group: root
+        state: directory
+        mode: '0600'
+
+    - name: "Add Cronjob - Clean logs of Nginx"
+      cron:
+        name: "Clean logs of Nginx"
+        state: present
+        minute: "0"
+        hour: "5"
+        day: "*"
+        month: "*"
+        weekday: "*"
+        job: 'find /var/log/nginx/*.gz -mtime +14 -delete'
+
+    - name: Setup file log rotate Nginx
+      copy:
+        src: nginx/config/logrotate.tpl
+        dest: /etc/logrotate.d/nginx-json
+
+    - name: "Add Cronjob - Log Rotate Json"
+      cron:
+        name: "Log Rotate - Logs Json"
+        state: present
+        minute: "0"
+        hour: "*/2"
+        day: "*"
+        month: "*"
+        weekday: "*"
+        job: 'logrotate -f /etc/logrotate.d/nginx-json'
+
+    - name: NGINX CONFIG - LOG FORMAT
+      copy:
+        src: nginx/config/logformat.tpl
+        dest: "{{ nginx_path }}/conf.d/logformat.conf"
+
+    - name: Setup nginx vhost
+      template:
+        src="nginx/sites/app.conf.tpl"
+        dest="{{ nginx_sites }}/{{ site_name }}.conf"
+    
+    - name: Setup nginx conf
+      template:
+        src="nginx/config/nginx.conf.tpl"
+        dest="{{ nginx_path }}/nginx.conf"
+      notify: restart nginx
+    
+    - name: Create symlink nginx vhost
+      file:
+        src="{{ nginx_sites }}/{{ site_name }}.conf"
+        dest="/etc/nginx/sites-enabled/{{ site_name }}.conf"
+        state=link
+      notify: restart nginx
+
+    - name: nginx -t && nginx -s reload
+      shell: nginx -t && nginx -s reload
+      register: nginx_test_result
+
+    - debug:
+        var: nginx_test_result.stdout_lines
+
+  handlers:
+    - name: restart nginx
+      service:
+        name=nginx
+        state=restarted
