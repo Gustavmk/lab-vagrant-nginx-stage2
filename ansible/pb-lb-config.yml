@@ -10,14 +10,17 @@
     upstream_name: "servers"
 
   tasks:
+
+    - name: Start service NGINX, if not started
+      ansible.builtin.service:
+        name: nginx.service
+        state: started
+
     - name: Allow everything and enable UFW
       community.general.ufw:
         state: disabled
         policy: allow
         
-    - name: Install NGINX
-      ansible.builtin.include_role:
-        name: nginx
 
     - name: Create directories for ssl certificates
       file: 
@@ -35,50 +38,40 @@
         state: directory
         mode: '0600'
 
-    - name: "Add Cronjob - Clean logs of Nginx"
-      cron:
-        name: "Clean logs of Nginx"
-        state: present
-        minute: "0"
-        hour: "5"
-        day: "*"
-        month: "*"
-        weekday: "*"
-        job: 'find /var/log/nginx/*.gz -mtime +14 -delete'
+    - name: Create directories for sites-available
+      file: 
+        path: /etc/nginx/sites-available
+        owner: root
+        group: root
+        state: directory
+        mode: '0600'
 
-    - name: Setup file log rotate Nginx
-      copy:
-        src: nginx/config/logrotate.tpl
-        dest: /etc/logrotate.d/nginx-json
-
-    - name: "Add Cronjob - Log Rotate Json"
-      cron:
-        name: "Log Rotate - Logs Json"
-        state: present
-        minute: "0"
-        hour: "*/2"
-        day: "*"
-        month: "*"
-        weekday: "*"
-        job: 'logrotate -f /etc/logrotate.d/nginx-json'
+    - name: Create directories for sites-enabled
+      file: 
+        path: /etc/nginx/sites-enabled
+        owner: root
+        group: root
+        state: directory
+        mode: '0600'
 
     - name: NGINX CONFIG - LOG FORMAT
       copy:
         src: nginx/config/logformat.tpl
         dest: "{{ nginx_path }}/conf.d/logformat.conf"
-
-    - name: Setup nginx vhost
-      template:
-        src="nginx/sites/app.conf.tpl"
-        dest="{{ nginx_sites }}/{{ site_name }}.conf"
     
-    - name: Setup nginx conf
+    - name: NGINX - Setup Main Conf
       template:
         src="nginx/config/nginx.conf.tpl"
         dest="{{ nginx_path }}/nginx.conf"
+
+    - name: NGINX - Setup vHost
+      template:
+        src="nginx/sites/app.conf.tpl"
+        dest="{{ nginx_sites }}/{{ site_name }}.conf"
       notify: restart nginx
-    
-    - name: Create symlink nginx vhost
+
+ 
+    - name: NGINX - Create symlink vHost
       file:
         src="{{ nginx_sites }}/{{ site_name }}.conf"
         dest="/etc/nginx/sites-enabled/{{ site_name }}.conf"

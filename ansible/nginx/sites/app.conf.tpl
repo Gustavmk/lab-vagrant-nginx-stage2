@@ -1,4 +1,5 @@
 upstream {{ upstream_name }} {
+    server 192.168.56.41:8080;
     server 192.168.56.42:8080;
     server 192.168.56.43:8080;
 }
