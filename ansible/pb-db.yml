@@ -1,6 +1,7 @@
 - name: Setup and Update Config - Database 
   hosts: db
   become: True
+  remote_user: root
   collections:
     - Community.Docker
   vars:
