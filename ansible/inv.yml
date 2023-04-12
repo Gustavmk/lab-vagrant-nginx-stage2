@@ -1,13 +1,17 @@
 all:
   children:
+    db:
+      hosts:
+        192.168.56.51:
     web:
       hosts:
-        192.168.56.[42:43]:
+        192.168.56.[41:43]:
     loadbalancer:
       hosts:
-        192.168.56.41:
+        192.168.56.[31:32]:
     linux:
       children:
+        db:
         web:
         loadbalancer:
       vars:
