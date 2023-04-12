@@ -57,20 +57,25 @@
 
     - name: NGINX CONFIG - LOG FORMAT
       copy:
-        src: nginx/config/logformat.tpl
+        src: ../nginx/config/logformat.tpl
         dest: "{{ nginx_path }}/conf.d/logformat.conf"
     
     - name: NGINX - Setup Main Conf
       template:
-        src="nginx/config/nginx.conf.tpl"
+        src="../nginx/config/nginx.conf.tpl"
         dest="{{ nginx_path }}/nginx.conf"
 
     - name: NGINX - Setup vHost
       template:
-        src="nginx/sites/app.conf.tpl"
+        src="../nginx/sites/app.conf.tpl"
         dest="{{ nginx_sites }}/{{ site_name }}.conf"
       notify: restart nginx
 
+    - name: NGINX - Defautlt vHost
+      template:
+        src="../nginx/sites/default.conf.tpl"
+        dest="/etc/nginx/sites-enabled/default.conf"
+      notify: restart nginx
  
     - name: NGINX - Create symlink vHost
       file:
