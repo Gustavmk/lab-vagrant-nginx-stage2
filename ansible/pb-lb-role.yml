@@ -7,6 +7,7 @@
   roles:
     - role: nginxinc.nginx
   vars:
+    nginx_type: 'opensource'
     nginx_enable: true
     nginx_unit_enable: true
     nginx_branch: stable
@@ -29,3 +30,4 @@
         - delaycompress
         - notifempty
         - sharedscripts
+
