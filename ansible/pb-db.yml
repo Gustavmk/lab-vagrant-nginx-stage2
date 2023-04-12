@@ -52,6 +52,11 @@
         name: "{{ default_container_image }}"
         source: pull
 
+    - name: Pull 
+      community.docker.docker_image:
+        name: "dpage/pgadmin4"
+        source: pull
+        
     - name: Create default containers
       community.docker.docker_container:
         name: "{{ default_container_name }}_{{ item }}"
@@ -66,3 +71,18 @@
         ports:
           - "5432:5432"
       with_sequence: count={{ container_count }}
+
+    - name: Create - pgadmin4
+      community.docker.docker_container:
+        name: "mgmt_pgadmin4"
+        image: "dpage/pgadmin4" 
+        state: started
+        recreate: true
+        force_kill: true
+        env:
+          PGADMIN_DEFAULT_PASSWORD: 'Postgres2018!'
+          PGADMIN_DEFAULT_EMAIL: 'gustavo.mkuno@gmail.com'
+        volumes:
+          - /data/postgresql/{{ default_container_name }}:/var/lib/postgresql/data 
+        ports:
+          - "15432:80"
