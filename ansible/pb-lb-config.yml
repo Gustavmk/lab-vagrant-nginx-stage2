@@ -15,13 +15,7 @@
     - name: Start service NGINX, if not started
       ansible.builtin.service:
         name: nginx.service
-        state: started
-
-    - name: Allow everything and enable UFW
-      community.general.ufw:
-        state: disabled
-        policy: allow
-        
+        state: started 
 
     - name: Create directories for ssl certificates
       file: 

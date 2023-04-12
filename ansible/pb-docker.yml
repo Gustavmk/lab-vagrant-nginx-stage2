@@ -32,6 +32,7 @@
         - gnupg-agent
         - software-properties-common
         - gnupg
+        - git
 
     - name: Add Docker GPG apt Key
       apt_key:
