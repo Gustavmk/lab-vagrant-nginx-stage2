@@ -1,6 +1,18 @@
 ---
 site_list:
-  - site_name:
-    site_path:
+  - site_name: "test.com"
+    site_path: "/"
     upstream:
-    
+      name: "servers"
+      servers_list:
+        - "server 192.168.56.41:8080;"
+        - "server 192.168.56.42:8080;"
+        - "server 192.168.56.43:8080;"
+  - site_name: "test2.com"
+    site_path: "/"
+    upstream:
+      name: "servers"
+      servers_list:
+        - "server 192.168.56.41:8080;"
+        - "server 192.168.56.42:8080;"
+        - "server 192.168.56.43:8080;"

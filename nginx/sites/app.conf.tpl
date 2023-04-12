@@ -28,7 +28,7 @@ server {
     proxy_set_header   X-Forwarded-Proto $scheme;
 
     location / {
-        proxy_pass "http://{{ upstream_name }}/";
+        proxy_pass "http://{{ upstream_name }}/{{ site_path }}";
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Forwarded-Port $server_port;

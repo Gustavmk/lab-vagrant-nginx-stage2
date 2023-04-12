@@ -4,14 +4,14 @@
   remote_user: root
   collections:
     - nginxinc.nginx_core
+  vars_files:
+    - "./variables/{{ env }}/server.yml"
+    - "./variables/{{ env }}/sites.yml"
   vars:
-    nginx_path: /etc/nginx
+    nginx_path: "/etc/nginx"
     nginx_sites: "{{ nginx_path }}/sites-available"
-    site_name: "test.com"
-    upstream_name: "servers"
-
+  
   tasks:
-
     - name: Start service NGINX, if not started
       ansible.builtin.service:
         name: nginx.service
@@ -63,6 +63,8 @@
       template:
         src="../nginx/sites/app.conf.tpl"
         dest="{{ nginx_sites }}/{{ site_name }}.conf"
+      loop: "{{ site_list }}"
+
       notify: restart nginx
 
     - name: NGINX - Defautlt vHost
