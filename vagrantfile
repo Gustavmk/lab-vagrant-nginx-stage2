@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
     end
     
     
-    N = 2
+    N = 1
     (1..N).each do |i|
     config.vm.define "lb#{i}" do |lb|
       lb.ssh.insert_key = false
@@ -48,4 +48,6 @@ Vagrant.configure("2") do |config|
       SHELL
     end
   end
+
+  # END VAGRANTFILE
 end

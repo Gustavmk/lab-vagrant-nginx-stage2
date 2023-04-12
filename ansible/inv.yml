@@ -8,7 +8,7 @@ all:
         192.168.56.[41:43]:
     loadbalancer:
       hosts:
-        192.168.56.[31:32]:
+        192.168.56.[31:31]:
     linux:
       children:
         db:
