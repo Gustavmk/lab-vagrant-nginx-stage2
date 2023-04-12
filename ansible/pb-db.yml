@@ -4,13 +4,13 @@
   remote_user: root
   collections:
     - Community.Docker
-  vars:
-    container_count: 1
-    default_container_name: database
-    default_container_image: postgres
+  vars_files:
+    - "./variables/{{ env }}/server.yml"
+  vars: 
+    - db_data: "/data/{{ env }}/db"
+
 
   tasks:
-
     - name: create DB group
       become: true
       group:
@@ -26,7 +26,7 @@
 
     - name: Create directories for Database
       file: 
-        path: /data/db/{{ default_container_name }}
+        path: "{{ db_data }}"
         owner: "{{ ansible_user }}"
         group: database
         state: directory
@@ -39,7 +39,7 @@
     
     - name: Pull default Docker image
       community.docker.docker_image:
-        name: "{{ default_container_image }}"
+        name: "{{ database_container_image }}"
         source: pull
 
     - name: Pull 
@@ -49,18 +49,18 @@
         
     - name: Create default containers
       community.docker.docker_container:
-        name: "{{ default_container_name }}_{{ item }}"
-        image: "{{ default_container_image }}"
+        name: "{{ database_container_name }}_{{ item }}"
+        image: "{{ database_container_image }}"
         state: started
         recreate: true
         force_kill: true
         env:
-          POSTGRES_PASSWORD: 'Postgres2018!'
+          POSTGRES_PASSWORD: "{{ database_password }}"
         volumes:
-          - /data/postgresql/{{ default_container_name }}:/var/lib/postgresql/data 
+          - "{{ db_data }}/{{ database_container_name }}:/var/lib/postgresql/data"
         ports:
           - "5432:5432"
-      with_sequence: count={{ container_count }}
+      with_sequence: count={{ database_container_count }}
 
     - name: Create - pgadmin4
       community.docker.docker_container:
@@ -70,9 +70,9 @@
         recreate: true
         force_kill: true
         env:
-          PGADMIN_DEFAULT_PASSWORD: 'Postgres2018!'
-          PGADMIN_DEFAULT_EMAIL: 'gustavo.mkuno@gmail.com'
+          PGADMIN_DEFAULT_PASSWORD: "{{ pgadmin_password }}"
+          PGADMIN_DEFAULT_EMAIL: "{{ pgadmin_email }}"
         volumes:
-          - /data/postgresql/{{ default_container_name }}:/var/lib/postgresql/data 
+          - "{{ db_data }}/mgmt_pgadmin4:/var/lib/pgadmin"
         ports:
           - "15432:80"

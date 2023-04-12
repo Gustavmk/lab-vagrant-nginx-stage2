@@ -1,0 +1,13 @@
+---
+env: "prd" # passing it in --extra-vars "env=prd"
+
+# DB
+database_container_name: "postgree"
+database_container_image: "postgres:latest"
+database_container_count: 1
+database_password: "Postgres2018!"
+pgadmin_password: "PostgresPgAdmin!"
+pgadmin_email: "admin@local.com"
+
+# LB
+

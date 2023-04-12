@@ -2,7 +2,7 @@
 ansible-playbook -i ansible/inv.yml ansible/pb-docker.yml 
 
 # DB
-ansible-playbook -i ansible/inv.yml ansible/pb-db.yml 
+ansible-playbook -i ansible/inv.yml ansible/pb-db.yml --extra-vars="environment=prd"
 
 # WEB 
 ansible-playbook -i ansible/inv.yml ansible/pb-web.yml
