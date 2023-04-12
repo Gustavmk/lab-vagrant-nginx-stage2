@@ -64,7 +64,6 @@
     - pip:
         name: docker
 
-
     ##### setup group and user
     - name: create docker group
       become: true

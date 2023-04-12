@@ -7,7 +7,6 @@
     - default_container_name: nginx_prometheus_exporter_loadbalancer
   tasks: 
 
-
     - name: Pull default Docker image
       community.docker.docker_image:
         name: "{{ default_container_image }}"

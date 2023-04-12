@@ -37,17 +37,6 @@
         containers: yes
       register: docker_info
     
-    #- name: Stop running containers
-    #  docker_container:
-    #    name: "{{ item }}"
-    #    state: stopped
-    #  loop: "{{ docker_info.containers | map(attribute='Id') | list }}"
-    
-    #- name: Remove Stoped docker containers
-    #  shell: |
-    #    docker rm $(docker ps -a -q);
-    #  when: docker_info.containers != 0
-
     - name: Pull default Docker image
       community.docker.docker_image:
         name: "{{ default_container_image }}"
